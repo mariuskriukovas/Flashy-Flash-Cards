@@ -7,7 +7,7 @@ export default class Card extends React.Component {
         side: true,
         addNew: false,
         newFrontSide:"",
-        newBackSide:"",
+        newBackSide:"example",
         cardInfo:{frontSide:"", backSide:""}
     }
 
