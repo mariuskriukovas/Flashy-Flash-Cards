@@ -76,6 +76,10 @@ export default class MenuElement extends React.Component
                         onPress={() => this.props.function(this.state.index)}
                         color = {'red'}
                 />
+                <Button title="Rename"
+                        onPress={() => this.props.functionRename(this.state.index)}
+                        color = {'blue'}
+                />
             </View>
         )
     }
