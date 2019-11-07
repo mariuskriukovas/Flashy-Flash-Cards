@@ -43,7 +43,7 @@ const sortMyDeck = (decks=[]) =>
 const createNewDeck =  (name)=>
 {
     let newDeck = createDeck(name,[])
-    newDeck.addCard("Empty deck","Empty deck",0)
+    //newDeck.addCard("Empty deck","Empty deck",0)
     return newDeck
 }
 

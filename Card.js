@@ -7,7 +7,7 @@ export default class Card extends React.Component {
         side: true,
         addNew: false,
         newFrontSide:"",
-        newBackSide:"example",
+        newBackSide:"",
         cardInfo:{frontSide:"", backSide:""}
     }
 
@@ -194,5 +194,4 @@ const styles = StyleSheet.create({
         margin: 20,
         width:200
     }
-
 });
