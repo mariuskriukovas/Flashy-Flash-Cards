@@ -35,9 +35,9 @@ const comapareMyCards = (cardI, cardII)=>
     return cardI.time - cardII.time
 }
 
-const sortMyDeck = (deck) =>
+const sortMyDeck = (cards) =>
 {
-    deck.cards.sort(comapareMyCards)
+    return cards.sort(comapareMyCards)
 }
 
 const createNewDeck =  (name)=>

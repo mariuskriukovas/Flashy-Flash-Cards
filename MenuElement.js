@@ -1,18 +1,12 @@
 import React from 'react';
 import {
-    StyleSheet,
-    Text,
     View,
-    ScrollView,
+    StyleSheet,
     Button,
     Image,
     TouchableHighlight,
-    TextInput,
-    CheckBox
+    Text
 } from 'react-native';
-import Card from "./Card";
-import CardManager from "./CardManager";
-
 
 const images = ()=> [
     require('./jscript.png'),

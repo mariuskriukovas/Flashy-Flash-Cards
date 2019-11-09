@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, ImageBackground,ScrollView, Button, TextInput } from 'react-native';
+import CardManager from "./CardManager";
 
+const defaultCard = CardManager().createNewCard("Empty deck","Empty deck",0)
+const print = (p)=> console.log(p)
 
 export default class Card extends React.Component {
     state = {
@@ -8,18 +11,36 @@ export default class Card extends React.Component {
         addNew: false,
         newFrontSide:"",
         newBackSide:"",
-        cardInfo:{frontSide:"", backSide:""}
+        cardInfo:{frontSide:"", backSide:""},
+        cards:[],
+        currentIndex: 0,
+
+        startTime:0,
+        endTime:0,
+
+        correctCards:[],
+        incorrectCards:[],
     }
 
+    constructor(props) {
+        super(props);
+        this.state.cards = props.cards
+        this.state.startTime = this.getTime()
+    }
+
+    getTime = () => {
+        return new Date().getTime();
+    }
 
     flipButtonAction = () => {
+        //end time
+        this.state.endTime = this.getTime()
+        this.getThisCard().setTime(this.state.endTime-this.state.startTime)
         this.setState(prev => ({side: !prev.side}))
     }
-    addButtonAction = () => {
-        this.setState(prev => ({addNew: !prev.addNew}))
-    }
+
     addNewButtonAction = () => {
-        this.props.addNewCard(this.state.newFrontSide, this.state.newBackSide)
+        this.state.cards.push(CardManager().createNewCard(this.state.newFrontSide, this.state.newBackSide, 0))
         this.setState(prev => ({addNew: !prev.addNew}))
     }
 
@@ -31,15 +52,74 @@ export default class Card extends React.Component {
         this.setState({newBackSide: newBackSide})
     }
 
-    rightButtonAction = () => {
-        this.props.onRight()
+    removeThisCard = () => {
+        this.state.cards.splice(this.state.currentIndex, 1)
+    }
+
+    getThisCard = () => {
+
+        if(!(this.state.currentIndex<=this.state.cards.length-1))
+        {
+            if(this.state.correctCards.length!==0 || this.state.incorrectCards.length!==0)
+            {
+                print("notempty")
+                this.createNewCardOrder()
+
+                return this.state.cards[this.state.currentIndex]
+            }
+            else
+            {
+                print("empty")
+                return defaultCard
+            }
+        }
+        return this.state.cards[this.state.currentIndex]
+    }
+
+    createNewCardOrder = () => {
+
+        this.state.cards = []
+
+        this.state.incorrectCards.sort(function(a, b){return b.time - a.time})
+        this.state.cards = this.state.incorrectCards
+        this.state.correctCards.sort(function(a, b){return b.time - a.time})
+        this.state.cards = this.state.cards.concat(this.state.correctCards)
+
+        print(this.state.cards.length)
+        this.state.cards.forEach(
+            (x)=>{print(x.front + x.back+" "+x.time)}
+        )
+
+        this.state.incorrectCards = []
+        this.state.correctCards = []
+    }
+
+    prepareNextCard = () =>
+    {
+        this.state.startTime = this.getTime()
+        this.removeThisCard()
         this.setState(prev => ({side: !prev.side}))
     }
+
+    rightButtonAction = () => {
+        if(this.getThisCard()!==defaultCard)
+        {
+            this.state.correctCards.push(this.getThisCard())
+            this.prepareNextCard()
+        }
+        else this.setState(prev => ({side: !prev.side}))
+    }
+
     wrongButtonAction = () => {
-        this.props.onWrong()
-        this.setState(prev => ({side: !prev.side}))
+        if(this.getThisCard()!==defaultCard)
+        {
+            this.state.incorrectCards.push(this.getThisCard())
+            this.prepareNextCard()
+        }
+        else this.setState(prev => ({side: !prev.side}))
     }
     removeButtonAction = () => {
+        this.removeThisCard()
         this.setState(prev => ({side: !prev.side}))
     }
 
@@ -63,7 +143,7 @@ export default class Card extends React.Component {
                     <this.CloseButton/>
                     <View style={styles.smallContainer}>
                         <ScrollView>
-                            <Text style = {styles.text}>{this.props.value.front}</Text>
+                            <Text style = {styles.text}>{this.getThisCard().front}</Text>
                         </ScrollView>
                     </View>
                     <View style={styles.smallestContainer}/>
@@ -73,7 +153,7 @@ export default class Card extends React.Component {
                         />
                         <View style={styles.smallestContainer}/>
                         <Button title="Add"
-                                onPress={() => this.addButtonAction()}
+                                onPress={() => {this.setState(prev => ({addNew: !prev.addNew}))}}
                                 color = {'yellow'}
                         />
                     </View>
@@ -89,7 +169,7 @@ export default class Card extends React.Component {
                 <ImageBackground source={require('./card2.png')} style={styles.container}>
                     <View style={styles.smallContainer}>
                         <ScrollView>
-                            <Text style = {styles.text}>{this.props.value.back}</Text>
+                            <Text style = {styles.text}>{this.getThisCard().back}</Text>
                         </ScrollView>
                     </View>
                     <View style={styles.smallestContainer}/>
@@ -131,7 +211,7 @@ export default class Card extends React.Component {
                         <View style={styles.buttonContainer}>
                             <Button title="Add" color = {'green'} onPress= {() => this.addNewButtonAction()} />
                             <View style={styles.smallestContainer}/>
-                            <Button title="Back" color = {'gray'} onPress= {() => this.addButtonAction()} />
+                            <Button title="Back" color = {'gray'} onPress= {() =>{this.setState(prev => ({addNew: !prev.addNew}))}} />
                         </View>
                     </View>
                 </ImageBackground>

@@ -15,14 +15,6 @@ import CardManager from "./CardManager";
 import MenuElement from "./MenuElement";
 
 
-const images = ()=> [
-    require('./jscript.png'),
-    require('./jscript2.png'),
-    require('./jscript3.png'),
-    require('./qust.png')
-]
-
-
 export default class Menu extends React.Component
 {
     state = {
@@ -84,7 +76,6 @@ export default class Menu extends React.Component
         }
         else
         {
-            console.log("netikiu kad radau"+this.state.renamedKey)
             let findIndex = -1
             this.state.MenuElements.forEach(
                 (x,index)=>
@@ -160,9 +151,17 @@ export default class Menu extends React.Component
         this.setState(prev => ({addNew: !prev.addNew}))
     }
 
+    saveState= ()=>
+    {
+        this.state.currentIndex = 0
+        this.state.MyDecks[this.state.usedDeckNumber].cards = this.state.cards
+        CardManager().sortMyDeck(this.state.MyDecks[this.state.usedDeckNumber])
+        this.selectDeck(this.state.usedDeckNumber)
+    }
 
     getCard= ()=>
     {
+        console.log("ilgis"+this.state.cards.length)
         if(this.state.cards.length === 0)
         {
             this.state.currentCard = CardManager().createNewCard("Empty deck","Empty deck",0)
@@ -175,9 +174,13 @@ export default class Menu extends React.Component
         else
         {
             this.state.currentIndex = 0
+            /*
+            this.state.currentIndex = 0
             this.state.MyDecks[this.state.usedDeckNumber].cards = this.state.cards
             CardManager().sortMyDeck(this.state.MyDecks[this.state.usedDeckNumber])
             this.selectDeck(this.state.usedDeckNumber)
+
+             */
         }
     }
 
@@ -188,6 +191,7 @@ export default class Menu extends React.Component
 
 
     addNewCard= (front,back)=>{
+        console.log("gal sitas")
         this.state.cards.push(CardManager().createNewCard(front,back, 0))
     }
 
@@ -200,6 +204,14 @@ export default class Menu extends React.Component
 
     changeToRight= ()=>
     {
+        this.getCard()
+    }
+
+    deleteThisCard= ()=>
+    {
+        console.log("on delete" + this.state.currentIndex)
+        this.state.cards.splice(this.state.currentIndex-1,1)
+        this.state.currentIndex = this.state.currentIndex-1
         this.getCard()
     }
 
@@ -270,7 +282,13 @@ export default class Menu extends React.Component
     render() {
         return (
             this.state.addNew ? <this.CreateNewDeck/>:
-            this.state.onGame ? <Card onClose ={this.goBackToMenu} value={this.state.currentCard} onWrong ={this.changeToWrong} onRight ={this.changeToRight} addNewCard = {this.addNewCard} />
+            this.state.onGame ? <Card onClose ={this.goBackToMenu}
+                                      value={this.state.currentCard}
+                                      onWrong ={this.changeToWrong}
+                                      onRight ={this.changeToRight}
+                                      onDelete ={this.deleteThisCard}
+                                      addNewCard = {this.addNewCard}
+                                      cards = {this.state.cards}  />
             : <this.showMenu/>)
         }
 
