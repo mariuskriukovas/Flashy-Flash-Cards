@@ -78,16 +78,21 @@ export default class Card extends React.Component {
 
     createNewCardOrder = () => {
 
-        this.state.cards = []
+        if(this.state.cards.length!==0)
+        {
+            this.state.cards.forEach((x)=>{this.state.incorrectCards.push(x)})
+        }
+
+        this.state.cards.forEach((x)=>{this.state.cards.pop()})
 
         this.state.incorrectCards.sort(function(a, b){return b.time - a.time})
-        this.state.cards = this.state.incorrectCards
+        this.state.incorrectCards.forEach((x)=>{this.state.cards.push(x)})
         this.state.correctCards.sort(function(a, b){return b.time - a.time})
-        this.state.cards = this.state.cards.concat(this.state.correctCards)
+        this.state.correctCards.forEach((x)=>{this.state.cards.push(x)})
 
-        print(this.state.cards.length)
+        print("new lenth "+this.state.cards.length)
         this.state.cards.forEach(
-            (x)=>{print(x.front + x.back+" "+x.time)}
+            (x)=>{print( "values" + x.front + x.back+" "+x.time)}
         )
 
         this.state.incorrectCards = []
@@ -123,13 +128,17 @@ export default class Card extends React.Component {
         this.setState(prev => ({side: !prev.side}))
     }
 
+    closeButtonAction = () => {
+        this.createNewCardOrder()
+        this.props.onClose()
+    }
 
     CloseButton = () =>
     {
         return(
             <View style={styles.closeButtonContainer}>
                 <Button title="X" color = {'gray'}
-                        onPress={() => this.props.onClose()}
+                        onPress={() => this.closeButtonAction()}
                 />
             </View>
         )
@@ -149,12 +158,13 @@ export default class Card extends React.Component {
                     <View style={styles.smallestContainer}/>
                     <View style={styles.buttonContainer}>
                         <Button title="Flip"
+                                  color = {'blue'}
                                   onPress={() => this.flipButtonAction()}
                         />
                         <View style={styles.smallestContainer}/>
                         <Button title="Add"
                                 onPress={() => {this.setState(prev => ({addNew: !prev.addNew}))}}
-                                color = {'yellow'}
+                                color = {'green'}
                         />
                     </View>
                 </ImageBackground>

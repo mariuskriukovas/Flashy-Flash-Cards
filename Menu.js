@@ -14,24 +14,19 @@ import Card from "./Card";
 import CardManager from "./CardManager";
 import MenuElement from "./MenuElement";
 
-
 export default class Menu extends React.Component
 {
     state = {
-        addNew:false,
+        deckNameEdit:false,
         onGame:false,
         changeMode:false,
-
         cards:[],
-        currentIndex:0,
-        currentCard:null,
         MenuElements:[],
+        MenuDeleteElements:[],
         MyDecks:null,
         newDeckName:"",
-        MenuDeleteElements:[],
         elementID:-1,
-        usedDeckNumber:0,
-        renamedKey:0
+        renamedKey:-1
     }
 
 
@@ -56,46 +51,56 @@ export default class Menu extends React.Component
     renameExistingOne=(key)=>
     {
         this.state.renamedKey = key
-        this.pressAddNew()
+        this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
     }
 
-    createAndAddNewDeck=()=>
+    createNewDeck=()=>
+    {
+        this.state.elementID++
+        this.state.MyDecks.push(CardManager().createNewDeck(this.state.newDeckName))
+        this.state.MenuElements.push(
+            <View key={this.state.elementID}>
+                <MenuElement index={this.state.elementID}
+                             name={this.state.newDeckName}
+                             deleteMode={false}
+                             function={this.selectDeck}
+                />
+            </View>
+        )
+    }
+
+    renameDeck=()=>
+    {
+        let findIndex = -1
+        this.state.MenuElements.forEach(
+            (x,index)=>
+            {
+                if(x.key==this.state.renamedKey)
+                {
+                    findIndex = index
+                }})
+
+        this.state.MyDecks[this.state.renamedKey].name = this.state.newDeckName
+        this.state.MenuElements[findIndex] = (
+            <View key={this.state.renamedKey}>
+                <MenuElement index  = {this.state.renamedKey}
+                             name = {this.state.newDeckName}
+                             deleteMode={false}
+                             function = {this.selectDeck}
+                />
+            </View>)
+        this.state.renamedKey = -1
+        this.pressRemoveOld()
+    }
+
+    createOrChangeDeckName=()=>
     {
         if(!this.state.changeMode) {
-            this.state.elementID++
-            this.state.MyDecks.push(CardManager().createNewDeck(this.state.newDeckName))
-            this.state.MenuElements.push(
-                <View key={this.state.elementID}>
-                    <MenuElement index={this.state.elementID}
-                                 name={this.state.newDeckName}
-                                 deleteMode={false}
-                                 function={this.selectDeck}
-                    />
-                </View>
-            )
+            this.createNewDeck()
         }
         else
         {
-            let findIndex = -1
-            this.state.MenuElements.forEach(
-                (x,index)=>
-                {
-                    if(x.key==this.state.renamedKey)
-                    {
-                        findIndex = index
-                    }})
-            console.log("netikiu kad radau index"+findIndex)
-            this.state.MyDecks[this.state.renamedKey].name = this.state.newDeckName
-            this.state.MenuElements[findIndex] = (
-                <View key={this.state.renamedKey}>
-                    <MenuElement index  = {this.state.renamedKey}
-                                 name = {this.state.newDeckName}
-                                 deleteMode={false}
-                                 function = {this.selectDeck}
-                    />
-                </View>)
-            this.state.renamedKey = -1
-            this.pressRemoveOld()
+            this.renameDeck()
         }
         this.goBackToMenuFromNewDeck()
     }
@@ -103,17 +108,13 @@ export default class Menu extends React.Component
     goBackToMenuFromNewDeck=()=>
     {
         this.state.newDeckName = ""
-        this.setState(prev => ({addNew: !prev.addNew}))
+        this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
     }
 
     selectDeck=(deckNumber)=>
     {
-        console.log(deckNumber)
-        this.state.usedDeckNumber = deckNumber
-        this.state.currentIndex = 0
         this.setState(prev => ({onGame: !prev.onGame}))
         this.state.cards = this.state.MyDecks[deckNumber].cards
-        this.getCard()
     }
 
     removeOldElement = (index)=>
@@ -148,71 +149,13 @@ export default class Menu extends React.Component
 
     pressAddNew = ()=>
     {
-        this.setState(prev => ({addNew: !prev.addNew}))
+        this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
     }
 
-    saveState= ()=>
-    {
-        this.state.currentIndex = 0
-        this.state.MyDecks[this.state.usedDeckNumber].cards = this.state.cards
-        CardManager().sortMyDeck(this.state.MyDecks[this.state.usedDeckNumber])
-        this.selectDeck(this.state.usedDeckNumber)
-    }
-
-    getCard= ()=>
-    {
-        console.log("ilgis"+this.state.cards.length)
-        if(this.state.cards.length === 0)
-        {
-            this.state.currentCard = CardManager().createNewCard("Empty deck","Empty deck",0)
-        }
-        else if(this.state.currentIndex<this.state.cards.length)
-        {
-            this.state.currentCard = this.state.cards[this.state.currentIndex]
-            this.setState(prev => ({currentIndex: prev.currentIndex+1}))
-        }
-        else
-        {
-            this.state.currentIndex = 0
-            /*
-            this.state.currentIndex = 0
-            this.state.MyDecks[this.state.usedDeckNumber].cards = this.state.cards
-            CardManager().sortMyDeck(this.state.MyDecks[this.state.usedDeckNumber])
-            this.selectDeck(this.state.usedDeckNumber)
-
-             */
-        }
-    }
 
     doneRemoving = ()=>
     {
         this.setState(prev => ({changeMode: !prev.changeMode}))
-    }
-
-
-    addNewCard= (front,back)=>{
-        console.log("gal sitas")
-        this.state.cards.push(CardManager().createNewCard(front,back, 0))
-    }
-
-
-    changeToWrong = ()=>
-    {
-        console.log("wrong")
-        this.getCard()
-    }
-
-    changeToRight= ()=>
-    {
-        this.getCard()
-    }
-
-    deleteThisCard= ()=>
-    {
-        console.log("on delete" + this.state.currentIndex)
-        this.state.cards.splice(this.state.currentIndex-1,1)
-        this.state.currentIndex = this.state.currentIndex-1
-        this.getCard()
     }
 
     changeNewDeckName = (newDeckName) => {
@@ -250,18 +193,18 @@ export default class Menu extends React.Component
                         />
                     </View>
                     <View style={styles.emptyContainer}/>
-
                 </ScrollView>
             </View>
         )
     }
 
-    CreateNewDeck= ()=>
+    CreateOrChangeDeck= ()=>
     {
         return (
             <View style={styles.container}>
+                <View style={styles.emptyContainer}/>
                 <Text style = {styles.text}>
-                    New Card Deck
+                    Enter new deck name
                 </Text>
                 <TextInput
                     style={styles.input}
@@ -270,7 +213,7 @@ export default class Menu extends React.Component
                     multiline={true}
                 />
                 <View style={styles.buttonContainer}>
-                    <Button title="Add" color = {'green'} onPress= {() => this.createAndAddNewDeck()} />
+                    <Button title="Add" color = {'green'} onPress= {() => this.createOrChangeDeckName()} />
                     <View style={styles.smallestContainer}/>
                     <Button title="Back" color = {'gray'} onPress= {() => this.goBackToMenuFromNewDeck()} />
                     </View>
@@ -281,17 +224,20 @@ export default class Menu extends React.Component
 
     render() {
         return (
-            this.state.addNew ? <this.CreateNewDeck/>:
+            this.state.deckNameEdit ? <this.CreateOrChangeDeck/>:
             this.state.onGame ? <Card onClose ={this.goBackToMenu}
-                                      value={this.state.currentCard}
-                                      onWrong ={this.changeToWrong}
-                                      onRight ={this.changeToRight}
-                                      onDelete ={this.deleteThisCard}
-                                      addNewCard = {this.addNewCard}
                                       cards = {this.state.cards}  />
             : <this.showMenu/>)
         }
 
+}
+
+const getElementIndex =(element)=>{
+    if(typeof element.key === "string")
+    {
+        return Number(element.key)
+    }
+    else return -1
 }
 
 const styles = StyleSheet.create({
@@ -339,5 +285,4 @@ const styles = StyleSheet.create({
         margin: 20,
         width:200
     }
-
 });

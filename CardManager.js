@@ -30,16 +30,6 @@ const createDeck = (name,cards)=>
     return myDeck
 }
 
-const comapareMyCards = (cardI, cardII)=>
-{
-    return cardI.time - cardII.time
-}
-
-const sortMyDeck = (cards) =>
-{
-    return cards.sort(comapareMyCards)
-}
-
 const createNewDeck =  (name)=>
 {
     let newDeck = createDeck(name,[])
@@ -59,10 +49,9 @@ const createMyDecks = ()=>
 
 const CardManager = ()=>
 {
-    const myFunctions  = {createMyDecks: null, createNewDeck:null, sortMyDeck:null, createNewCard:null}
+    const myFunctions  = {createMyDecks: null, createNewDeck:null, createNewCard:null}
     myFunctions.createMyDecks = createMyDecks
     myFunctions.createNewDeck = createNewDeck
-    myFunctions.sortMyDeck = sortMyDeck
     myFunctions.createNewCard = createNewCard
     return myFunctions
 }

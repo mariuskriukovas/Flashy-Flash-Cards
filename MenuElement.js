@@ -17,14 +17,6 @@ const images = ()=> [
 
 const defaultPictureIndex = 3
 
-/*
-    props:
-    selectDeck
-    index
-    name
-    removeOldElement
- */
-
 export default class MenuElement extends React.Component
 {
     state = {
@@ -83,16 +75,6 @@ export default class MenuElement extends React.Component
     }
 }
 
-
-
-
-
-
-
-
-
-
-
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
@@ -110,33 +92,5 @@ const styles = StyleSheet.create({
         },
     text: {
         fontSize : 30
-    },
-
-    buttonContainer: {
-        flexDirection:'row',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    smallestContainer: {
-        width: 30,
-        height: 20
-    },
-    emptyContainer: {
-        height: 40
-    },
-
-
-    inputField: {
-        flexDirection:'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    input: {
-        borderColor: 'black',
-        borderWidth: 1,
-        padding: 5,
-        margin: 20,
-        width:200
     }
-
 });
