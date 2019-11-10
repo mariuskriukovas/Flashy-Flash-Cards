@@ -42,7 +42,7 @@ export default class MenuElement extends React.Component
     {
         return (
             <View key={this.state.index}>
-                <TouchableHighlight onPress={() => this.props.function(this.state.index)} style={styles.touchable}>
+                <TouchableHighlight onPress={() => this.props.selectElement(this.state.index)} style={styles.touchable}>
                     <Image source={this.choosePicture(this.state.index)} style={styles.picture}/>
                 </TouchableHighlight>
                 <Text style = {styles.text}>{this.props.name}</Text>
@@ -59,17 +59,16 @@ export default class MenuElement extends React.Component
                 </TouchableHighlight>
                 <Text style = {styles.text}>{this.props.name}</Text>
                 <Button title="Remove"
-                        onPress={() => this.props.function(this.state.index)}
+                        onPress={() => this.props.removeElement(this.state.index)}
                         color = {'red'}
                 />
                 <Button title="Rename"
-                        onPress={() => this.props.functionRename(this.state.index)}
+                        onPress={() => this.props.renameElement(this.state.index)}
                         color = {'blue'}
                 />
             </View>
         )
     }
-
     render() {
         return (this.props.deleteMode ? <this.DeleteMode/> : <this.NormalMode/>)
     }

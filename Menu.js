@@ -22,140 +22,90 @@ export default class Menu extends React.Component
         changeMode:false,
         cards:[],
         MenuElements:[],
-        MenuDeleteElements:[],
+        MenuChangeElements:[],
         MyDecks:null,
         newDeckName:"",
-        elementID:-1,
-        renamedKey:-1
+        renameIndex:-1
     }
 
-
-    constructor(props) {
-        super(props);
-        this.state.MyDecks = CardManager().createMyDecks()
+    createNewMenuElementsFromMyDecks=()=>
+    {
         this.state.MenuElements = this.state.MyDecks.map(
             (x,index)=>{
-                this.state.elementID++
                 return(
-                <View key={this.state.elementID}>
-                    <MenuElement index  = {this.state.elementID}
-                                 name = {x.name}
-                                 changeMode={false}
-                                 function = {this.selectDeck}
-                    />
-                </View>)
+                    <View key={index}>
+                        <MenuElement index  = {index}
+                                     name = {x.name}
+                                     changeMode={false}
+                                     selectElement = {this.selectDeck}
+                        />
+                    </View>)
             }
         )
     }
 
-    renameExistingOne=(key)=>
-    {
-        this.state.renamedKey = key
-        this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
-    }
 
-    createNewDeck=()=>
+    createNewMenuChangeElementsFromMyDecks=()=>
     {
-        this.state.elementID++
-        this.state.MyDecks.push(CardManager().createNewDeck(this.state.newDeckName))
-        this.state.MenuElements.push(
-            <View key={this.state.elementID}>
-                <MenuElement index={this.state.elementID}
-                             name={this.state.newDeckName}
-                             deleteMode={false}
-                             function={this.selectDeck}
-                />
-            </View>
+        this.state.MenuChangeElements = this.state.MyDecks.map(
+            (x,index)=>{
+                return(
+                    <View key={index}>
+                        <MenuElement index  = {index}
+                                     deleteMode={true}
+                                     name = {x.name}
+                                     removeElement = {this.removeElement}
+                                     renameElement = {this.renameElement}
+                        />
+                    </View>)
+            }
         )
     }
 
-    renameDeck=()=>
-    {
-        let findIndex = -1
-        this.state.MenuElements.forEach(
-            (x,index)=>
-            {
-                if(x.key==this.state.renamedKey)
-                {
-                    findIndex = index
-                }})
-
-        this.state.MyDecks[this.state.renamedKey].name = this.state.newDeckName
-        this.state.MenuElements[findIndex] = (
-            <View key={this.state.renamedKey}>
-                <MenuElement index  = {this.state.renamedKey}
-                             name = {this.state.newDeckName}
-                             deleteMode={false}
-                             function = {this.selectDeck}
-                />
-            </View>)
-        this.state.renamedKey = -1
-        this.pressRemoveOld()
+    constructor(props) {
+        super(props);
+        this.state.MyDecks = CardManager().createMyDecks()
+        this.uploadInfo()
     }
 
-    createOrChangeDeckName=()=>
+    uploadInfo=()=>
     {
-        if(!this.state.changeMode) {
-            this.createNewDeck()
-        }
-        else
-        {
-            this.renameDeck()
-        }
-        this.goBackToMenuFromNewDeck()
+        this.createNewMenuElementsFromMyDecks()
+        this.createNewMenuChangeElementsFromMyDecks()
     }
 
-    goBackToMenuFromNewDeck=()=>
+    renameElement=(index)=>
     {
-        this.state.newDeckName = ""
+        this.state.renameIndex = index
         this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
     }
 
     selectDeck=(deckNumber)=>
     {
-        this.setState(prev => ({onGame: !prev.onGame}))
         this.state.cards = this.state.MyDecks[deckNumber].cards
+        this.setState(prev => ({onGame: !prev.onGame}))
     }
 
-    removeOldElement = (index)=>
+    removeElement = (index)=>
     {
-        this.state.MenuElements.splice(index, 1)
-        this.pressRemoveOld()
-    }
-
-    pressRemoveOld = ()=>
-    {
-        this.state.MenuDeleteElements = this.state.MenuElements.map(
-            (x,index)=>{
-                return(
-                    <View key={x.key}>
-                        <MenuElement index  = {x.key}
-                                     deleteMode={true}
-                                     name = {this.state.MyDecks[x.key].name}
-                                     function = {this.removeOldElement}
-                                     functionRename = {this.renameExistingOne}
-                        />
-                    </View>)
-            }
-        )
+        this.state.MyDecks.splice(index, 1)
+        this.uploadInfo()
         this.setState(prev => ({changeMode: true}))
     }
 
-
-    goBackToMenu=()=>
+    createOrChangeDeckName=()=>
     {
-        this.setState(prev => ({onGame: !prev.onGame}))
-    }
-
-    pressAddNew = ()=>
-    {
+        if(!this.state.changeMode) {
+            this.state.MyDecks.push(CardManager().createNewDeck(this.state.newDeckName))
+        }
+        else
+        {
+            this.state.MyDecks[this.state.renameIndex].name = this.state.newDeckName
+            this.state.renameIndex = -1
+        }
+        this.uploadInfo()
+        this.state.newDeckName = ""
         this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))
-    }
-
-
-    doneRemoving = ()=>
-    {
-        this.setState(prev => ({changeMode: !prev.changeMode}))
     }
 
     changeNewDeckName = (newDeckName) => {
@@ -168,10 +118,10 @@ export default class Menu extends React.Component
             this.state.changeMode ?
                 <View style={styles.container}>
                     <ScrollView>
-                        {this.state.MenuDeleteElements}
+                        {this.state.MenuChangeElements}
                         <View style={styles.emptyContainer}/>
                         <Button title="Done"
-                                onPress={() => this.doneRemoving()}
+                                onPress={() => this.setState(prev => ({changeMode: !prev.changeMode}))}
                                 color = {'green'}
                         />
                     </ScrollView>
@@ -183,12 +133,12 @@ export default class Menu extends React.Component
                     <View style={styles.emptyContainer}/>
                     <View style={styles.buttonContainer}>
                         <Button title="Add New"
-                                onPress={() => this.pressAddNew()}
+                                onPress={() => this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))}
                                 color = {'green'}
                         />
                         <View style={styles.smallestContainer}/>
                         <Button title="Change Old"
-                                onPress={() => this.pressRemoveOld()}
+                                onPress={() => this.setState(prev => ({changeMode: true}))}
                                 color = {'red'}
                         />
                     </View>
@@ -215,29 +165,19 @@ export default class Menu extends React.Component
                 <View style={styles.buttonContainer}>
                     <Button title="Add" color = {'green'} onPress= {() => this.createOrChangeDeckName()} />
                     <View style={styles.smallestContainer}/>
-                    <Button title="Back" color = {'gray'} onPress= {() => this.goBackToMenuFromNewDeck()} />
+                    <Button title="Back" color = {'gray'} onPress= {() => this.setState(prev => ({deckNameEdit: !prev.deckNameEdit}))} />
                     </View>
             </View>
         )
     }
 
-
     render() {
         return (
             this.state.deckNameEdit ? <this.CreateOrChangeDeck/>:
-            this.state.onGame ? <Card onClose ={this.goBackToMenu}
+            this.state.onGame ? <Card onClose ={() => this.setState(prev => ({onGame: !prev.onGame}))}
                                       cards = {this.state.cards}  />
             : <this.showMenu/>)
         }
-
-}
-
-const getElementIndex =(element)=>{
-    if(typeof element.key === "string")
-    {
-        return Number(element.key)
-    }
-    else return -1
 }
 
 const styles = StyleSheet.create({
@@ -271,8 +211,6 @@ const styles = StyleSheet.create({
     emptyContainer: {
         height: 40
     },
-
-
     inputField: {
         flexDirection:'column',
         alignItems: 'center',

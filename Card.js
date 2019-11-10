@@ -4,6 +4,7 @@ import CardManager from "./CardManager";
 
 const defaultCard = CardManager().createNewCard("Empty deck","Empty deck",0)
 const print = (p)=> console.log(p)
+const printCard = (card)=> console.log(card.front + "  "+card.back + "  "+card.time)
 
 export default class Card extends React.Component {
     state = {
@@ -41,6 +42,8 @@ export default class Card extends React.Component {
 
     addNewButtonAction = () => {
         this.state.cards.push(CardManager().createNewCard(this.state.newFrontSide, this.state.newBackSide, 0))
+        this.state.newFrontSide = ""
+        this.state.newBackSide = ""
         this.setState(prev => ({addNew: !prev.addNew}))
     }
 
@@ -62,9 +65,8 @@ export default class Card extends React.Component {
         {
             if(this.state.correctCards.length!==0 || this.state.incorrectCards.length!==0)
             {
-                print("notempty")
+                print("not empty")
                 this.createNewCardOrder()
-
                 return this.state.cards[this.state.currentIndex]
             }
             else
@@ -90,10 +92,8 @@ export default class Card extends React.Component {
         this.state.correctCards.sort(function(a, b){return b.time - a.time})
         this.state.correctCards.forEach((x)=>{this.state.cards.push(x)})
 
-        print("new lenth "+this.state.cards.length)
-        this.state.cards.forEach(
-            (x)=>{print( "values" + x.front + x.back+" "+x.time)}
-        )
+        print("new length "+this.state.cards.length)
+        this.state.cards.forEach((x)=>{printCard(x)})
 
         this.state.incorrectCards = []
         this.state.correctCards = []
