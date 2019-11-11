@@ -1043,24 +1043,3 @@ const decks = [
 ]
 
 export default decks
-/*
-const Print = (x)=>{
-    console.log(x.name)
-    console.log("------------------------------")
-    x.cards.forEach(
-        (y)=>{
-            console.log(y.front)
-            console.log(y.back)
-        }
-    )
-    console.log("-----------------------------")
-
-}
-
-//export default decks
-decks.forEach(
-    (x)=>{
-        Print(x)
-    }
-)
-*/

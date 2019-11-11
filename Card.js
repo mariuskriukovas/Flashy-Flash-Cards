@@ -85,8 +85,7 @@ export default class Card extends React.Component {
             this.state.cards.forEach((x)=>{this.state.incorrectCards.push(x)})
         }
 
-        this.state.cards.forEach((x)=>{this.state.cards.pop()})
-
+        for (let i = this.state.cards.length; i>0;i--) this.state.cards.pop()
         this.state.incorrectCards.sort(function(a, b){return b.time - a.time})
         this.state.incorrectCards.forEach((x)=>{this.state.cards.push(x)})
         this.state.correctCards.sort(function(a, b){return b.time - a.time})
@@ -94,7 +93,6 @@ export default class Card extends React.Component {
 
         print("new length "+this.state.cards.length)
         this.state.cards.forEach((x)=>{printCard(x)})
-
         this.state.incorrectCards = []
         this.state.correctCards = []
     }
@@ -285,3 +283,4 @@ const styles = StyleSheet.create({
         width:200
     }
 });
+

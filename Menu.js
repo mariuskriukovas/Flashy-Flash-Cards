@@ -10,6 +10,7 @@ import {
     TextInput,
     CheckBox
 } from 'react-native';
+
 import Card from "./Card";
 import CardManager from "./CardManager";
 import MenuElement from "./MenuElement";
