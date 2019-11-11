@@ -65,13 +65,13 @@ export default class Card extends React.Component {
         {
             if(this.state.correctCards.length!==0 || this.state.incorrectCards.length!==0)
             {
-                print("not empty")
+                //print("not empty")
                 this.createNewCardOrder()
                 return this.state.cards[this.state.currentIndex]
             }
             else
             {
-                print("empty")
+                //print("empty")
                 return defaultCard
             }
         }
@@ -91,8 +91,8 @@ export default class Card extends React.Component {
         this.state.correctCards.sort(function(a, b){return b.time - a.time})
         this.state.correctCards.forEach((x)=>{this.state.cards.push(x)})
 
-        print("new length "+this.state.cards.length)
-        this.state.cards.forEach((x)=>{printCard(x)})
+        //print("new length "+this.state.cards.length)
+        //this.state.cards.forEach((x)=>{printCard(x)})
         this.state.incorrectCards = []
         this.state.correctCards = []
     }
