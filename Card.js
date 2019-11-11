@@ -82,6 +82,7 @@ export default class Card extends React.Component {
 
         if(this.state.cards.length!==0)
         {
+            this.state.cards.forEach((x)=>{x.time = 0})
             this.state.cards.forEach((x)=>{this.state.incorrectCards.push(x)})
         }
 
